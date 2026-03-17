@@ -1,0 +1,31 @@
+{
+  "name": "@dapp-query/core",
+  "version": "0.1.0",
+  "description": "Resilient on-chain data queries with multi-source fallback and local caching.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "peerDependencies": {
+    "viem": ">=2.0.0"
+  },
+  "devDependencies": {
+    "viem": "^2.23.0",
+    "typescript": "^5.7.0",
+    "vite": "^6.0.0",
+    "vite-plugin-dts": "^4.0.0",
+    "vitest": "^3.0.0",
+    "fake-indexeddb": "^6.0.0"
+  },
+  "license": "MIT"
+}
