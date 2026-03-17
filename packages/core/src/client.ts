@@ -107,29 +107,26 @@ export function createQueryClient(config: QueryClientConfig = {}) {
     sources: Source<T>[],
     args: unknown[],
   ): Promise<T> {
-    const settled = await Promise.allSettled(
-      sources.map(async (source) => {
-        const start = Date.now()
-        try {
-          const result = await source.fetch(...args)
-          recordSuccess(source.id, Date.now() - start)
-          return result
-        } catch (error) {
-          recordFailure(source.id)
-          throw error
-        }
-      }),
-    )
-
-    for (const result of settled) {
-      if (result.status === 'fulfilled') return result.value
+    try {
+      return await Promise.any(
+        sources.map(async (source) => {
+          const start = Date.now()
+          try {
+            const result = await source.fetch(...args)
+            recordSuccess(source.id, Date.now() - start)
+            return result
+          } catch (error) {
+            recordFailure(source.id)
+            throw error
+          }
+        }),
+      )
+    } catch (error) {
+      if (error instanceof AggregateError) {
+        throw error.errors[0] ?? new Error('All sources failed')
+      }
+      throw error
     }
-
-    const errors = settled
-      .filter((r): r is PromiseRejectedResult => r.status === 'rejected')
-      .map((r) => r.reason)
-
-    throw errors[0] ?? new Error('All sources failed')
   }
 
   /** Deduplicated fetch — only one in-flight request per cache key. */

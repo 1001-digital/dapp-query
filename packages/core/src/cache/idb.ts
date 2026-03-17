@@ -40,7 +40,8 @@ export function idbCache(dbName: string = 'dapp-query'): Cache {
     async get<T>(key: string) {
       const db = await getDB()
       const raw = await tx(db, 'readonly', (s) => s.get(key))
-      return raw as CacheEntry<T> | undefined
+      if (raw === undefined) return undefined
+      return JSON.parse(JSON.stringify(raw), bigintReviver) as CacheEntry<T>
     },
 
     async set<T>(key: string, entry: CacheEntry<T>) {

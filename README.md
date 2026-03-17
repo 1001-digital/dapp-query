@@ -62,6 +62,7 @@ const onchain = rpcSource({
   ),
   address: '0x...',
   fromBlock: 18_000_000n,
+  filter: (_collection, tokenId) => ({ tokenId }),
   transform: (logs) => logs.map((l: any) => ({
     minter: l.args.minter,
     amount: l.args.amount,
@@ -189,7 +190,7 @@ const transfersQuery = {
 
 **`memoryCache(maxSize?)`** — In-memory LRU cache. Fast, no persistence. Default: 500 entries.
 
-**`idbCache(dbName?)`** — IndexedDB-backed persistent cache. Survives page reloads. Handles BigInt serialization automatically.
+**`idbCache(dbName?)`** — IndexedDB-backed persistent cache. Survives page reloads. Handles BigInt serialization and deserialization automatically.
 
 Both implement the `Cache` interface — bring your own if needed:
 

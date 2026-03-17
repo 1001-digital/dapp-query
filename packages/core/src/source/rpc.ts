@@ -14,6 +14,8 @@ export interface RpcSourceConfig<T> {
   maxBlockRange?: number
   /** Start block for historical queries. Default: 0. */
   fromBlock?: bigint
+  /** Map query arguments to indexed event parameter filters. */
+  filter?: (...args: unknown[]) => Record<string, unknown>
 }
 
 /**
@@ -28,6 +30,7 @@ export function rpcSource<T>(config: RpcSourceConfig<T>): Source<T> {
     transform,
     maxBlockRange = 2000,
     fromBlock: configFromBlock = 0n,
+    filter,
   } = config
 
   return {
@@ -35,8 +38,8 @@ export function rpcSource<T>(config: RpcSourceConfig<T>): Source<T> {
 
     async fetch(...args: unknown[]) {
       const currentBlock = await client.getBlockNumber()
-      const fromBlock = (args[0] as bigint | undefined) ?? configFromBlock
-      const chunks = chunkRange(fromBlock, currentBlock, maxBlockRange)
+      const chunks = chunkRange(configFromBlock, currentBlock, maxBlockRange)
+      const filterArgs = filter?.(...args)
 
       const results = await Promise.all(
         chunks.map(([from, to]) =>
@@ -46,6 +49,7 @@ export function rpcSource<T>(config: RpcSourceConfig<T>): Source<T> {
             eventName: event.name,
             fromBlock: from,
             toBlock: to,
+            args: filterArgs,
           } as GetContractEventsParameters)
         ),
       )

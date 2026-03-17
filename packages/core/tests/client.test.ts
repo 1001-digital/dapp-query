@@ -153,8 +153,7 @@ describe('createQueryClient', () => {
       )
 
       const result = await client.fetch(query, 'k')
-      // Both resolve, but race returns all settled — first fulfilled wins
-      expect(result).toBe('slow-data') // Promise.allSettled preserves order
+      expect(result).toBe('fast-data')
     })
 
     it('succeeds if at least one source works', async () => {
