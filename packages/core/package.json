@@ -1,5 +1,5 @@
 {
-  "name": "@dapp-query/core",
+  "name": "@1001-digital/dapp-query-core",
   "version": "0.1.0",
   "description": "Resilient on-chain data queries with multi-source fallback and local caching.",
   "type": "module",
@@ -9,7 +9,9 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "vite build",
     "typecheck": "tsc --noEmit",

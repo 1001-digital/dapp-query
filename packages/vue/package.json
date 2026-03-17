@@ -1,5 +1,5 @@
 {
-  "name": "@dapp-query/vue",
+  "name": "@1001-digital/dapp-query-vue",
   "version": "0.1.0",
   "description": "Vue composables for dapp-query.",
   "type": "module",
@@ -9,7 +9,9 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "vite build",
     "typecheck": "tsc --noEmit"
