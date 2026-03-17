@@ -13,6 +13,8 @@ export interface RpcSourceConfig<T> {
     maxBlockRange?: number;
     /** Start block for historical queries. Default: 0. */
     fromBlock?: bigint;
+    /** Map query arguments to indexed event parameter filters. */
+    filter?: (...args: unknown[]) => Record<string, unknown>;
 }
 /**
  * Creates a source that fetches event logs directly from an RPC node.

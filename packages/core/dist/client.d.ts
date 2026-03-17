@@ -16,6 +16,14 @@ export declare function createQueryClient(config?: QueryClientConfig): {
     invalidate<T, TArgs extends unknown[]>(query: QueryDefinition<T, TArgs>, ...args: TArgs): Promise<void>;
     /** Access to source health data (for debugging/monitoring). */
     getSourceHealth(sourceId: string): SourceHealth | undefined;
+    /**
+     * Poll sources until a predicate is satisfied or max attempts are exhausted.
+     * Useful for waiting until on-chain state reflects a recent transaction.
+     */
+    waitForChange<T, TArgs extends unknown[]>(query: QueryDefinition<T, TArgs>, args: TArgs, predicate: (current: T, previous: T | undefined) => boolean, options?: {
+        interval?: number;
+        maxAttempts?: number;
+    }): Promise<T | undefined>;
     /** Clear all caches and reset health tracking. */
     reset(): Promise<void>;
 };
