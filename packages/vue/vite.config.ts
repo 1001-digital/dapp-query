@@ -9,7 +9,7 @@ export default defineConfig({
       formats: ['es'],
     },
     rollupOptions: {
-      external: ['vue', '@dapp-query/core'],
+      external: ['vue', '@1001-digital/dapp-query-core'],
     },
   },
   plugins: [

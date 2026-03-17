@@ -35,7 +35,7 @@ importers:
 
   packages/vue:
     devDependencies:
-      '@dapp-query/core':
+      '@1001-digital/dapp-query-core':
         specifier: workspace:*
         version: link:../core
       typescript:

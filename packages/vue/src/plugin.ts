@@ -1,5 +1,5 @@
 import { inject, type App, type InjectionKey } from 'vue'
-import type { QueryClient } from '@dapp-query/core'
+import type { QueryClient } from '@1001-digital/dapp-query-core'
 
 export const QueryClientKey: InjectionKey<QueryClient> = Symbol('dapp-query')
 

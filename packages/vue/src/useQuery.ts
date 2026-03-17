@@ -7,7 +7,7 @@ import {
   type Ref,
   type MaybeRefOrGetter,
 } from 'vue'
-import type { QueryDefinition, QueryResult } from '@dapp-query/core'
+import type { QueryDefinition, QueryResult } from '@1001-digital/dapp-query-core'
 import { useQueryClient } from './plugin.js'
 
 export interface UseQueryReturn<T> {

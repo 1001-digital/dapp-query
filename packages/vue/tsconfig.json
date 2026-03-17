@@ -11,7 +11,7 @@
     "rootDir": "src",
     "lib": ["ES2022", "DOM"],
     "paths": {
-      "@dapp-query/core": ["../core/dist"]
+      "@1001-digital/dapp-query-core": ["../core/dist"]
     }
   },
   "include": ["src"],
