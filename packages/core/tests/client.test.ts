@@ -226,6 +226,159 @@ describe('createQueryClient', () => {
     })
   })
 
+  describe('waitForChange', () => {
+    it('resolves immediately when predicate matches on first fetch', async () => {
+      const client = createQueryClient()
+      const query = makeQuery([makeSource('s1', 10)])
+
+      // Seed cache with old value
+      await client.fetch(query, 'k')
+
+      // Source now returns a different value
+      const source = customSource({
+        id: 's1',
+        fetch: async () => 20,
+      })
+      const query2 = makeQuery([source])
+
+      const result = await client.waitForChange(
+        query2,
+        ['k'],
+        (current, previous) => current !== previous,
+        { interval: 10, maxAttempts: 5 },
+      )
+
+      expect(result).toBe(20)
+    })
+
+    it('polls until predicate matches', async () => {
+      let counter = 0
+      const source = customSource({
+        id: 's1',
+        fetch: async () => ++counter,
+      })
+      const client = createQueryClient()
+      const query = makeQuery([source])
+
+      // Seed cache with value 1
+      await client.fetch(query, 'k')
+
+      // Now counter is at 1; predicate waits for value > 3
+      const result = await client.waitForChange(
+        query,
+        ['k'],
+        (current) => current > 3,
+        { interval: 10, maxAttempts: 10 },
+      )
+
+      // counter increments each fetch: 2, 3, 4 — matches at 4
+      expect(result).toBe(4)
+    })
+
+    it('returns undefined when max attempts exhausted', async () => {
+      const source = customSource({
+        id: 's1',
+        fetch: async () => 1, // Never changes
+      })
+      const client = createQueryClient()
+      const query = makeQuery([source])
+
+      // Seed cache
+      await client.fetch(query, 'k')
+
+      const result = await client.waitForChange(
+        query,
+        ['k'],
+        (current, previous) => current !== previous,
+        { interval: 10, maxAttempts: 3 },
+      )
+
+      expect(result).toBeUndefined()
+    })
+
+    it('updates cache and notifies subscribers on success', async () => {
+      let counter = 0
+      const source = customSource({
+        id: 's1',
+        fetch: async () => ++counter,
+      })
+      const client = createQueryClient({ defaultStaleTime: 60_000 })
+      const query = makeQuery([source])
+
+      const results: any[] = []
+      const unsub = client.subscribe(query, ['k'], (r) => {
+        results.push({ ...r })
+      })
+
+      // Wait for initial subscription load
+      await new Promise((r) => setTimeout(r, 50))
+      expect(results[results.length - 1].data).toBe(1)
+
+      // waitForChange: predicate matches when value > 1
+      await client.waitForChange(
+        query,
+        ['k'],
+        (current) => current > 1,
+        { interval: 10, maxAttempts: 5 },
+      )
+
+      expect(results[results.length - 1].data).toBe(2)
+
+      // Subsequent fetch should use updated cache
+      const cached = await client.fetch(query, 'k')
+      expect(cached).toBe(2)
+
+      unsub()
+    })
+
+    it('updates cache even when exhausted', async () => {
+      let counter = 0
+      const source = customSource({
+        id: 's1',
+        fetch: async () => ++counter,
+      })
+      const client = createQueryClient({ defaultStaleTime: 60_000 })
+      const query = makeQuery([source])
+
+      // Seed cache
+      await client.fetch(query, 'k')
+      expect(counter).toBe(1)
+
+      // Predicate never satisfied (always false)
+      await client.waitForChange(
+        query,
+        ['k'],
+        () => false,
+        { interval: 10, maxAttempts: 3 },
+      )
+
+      // Cache should be updated with the latest value fetched during polling
+      const cached = await client.fetch(query, 'k')
+      // counter went 1 (seed) → 2, 3, 4 (3 poll attempts) — cache has 4
+      expect(cached).toBe(4)
+    })
+
+    it('works with no prior cache', async () => {
+      let counter = 0
+      const source = customSource({
+        id: 's1',
+        fetch: async () => ++counter,
+      })
+      const client = createQueryClient()
+      const query = makeQuery([source])
+
+      // No seed — previous is undefined
+      const result = await client.waitForChange(
+        query,
+        ['k'],
+        (current, previous) => previous === undefined && current > 0,
+        { interval: 10, maxAttempts: 3 },
+      )
+
+      expect(result).toBe(1)
+    })
+  })
+
   describe('reset', () => {
     it('clears all state', async () => {
       const client = createQueryClient()

@@ -304,6 +304,65 @@ export function createQueryClient(config: QueryClientConfig = {}) {
       return health.get(sourceId)
     },
 
+    /**
+     * Poll sources until a predicate is satisfied or max attempts are exhausted.
+     * Useful for waiting until on-chain state reflects a recent transaction.
+     */
+    async waitForChange<T, TArgs extends unknown[]>(
+      query: QueryDefinition<T, TArgs>,
+      args: TArgs,
+      predicate: (current: T, previous: T | undefined) => boolean,
+      options?: { interval?: number; maxAttempts?: number },
+    ): Promise<T | undefined> {
+      const key = query.key(...args)
+      const transform = query.transform ?? ((x: T) => x)
+      const interval = options?.interval ?? 3000
+      const maxAttempts = options?.maxAttempts ?? 10
+
+      async function updateCacheAndNotify(data: T) {
+        await cache.set(key, { data, timestamp: Date.now() })
+        const aq = active.get(key)
+        if (aq) {
+          aq.result = { data, error: undefined, pending: false, revalidating: false }
+          for (const sub of aq.subscribers) {
+            sub(aq.result as QueryResult<T>)
+          }
+        }
+      }
+
+      // Read current cache as "previous"
+      const cached = await cache.get<T>(key)
+      const previous = cached?.data
+
+      let latest: T | undefined
+
+      for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        if (attempt > 0) {
+          await new Promise((r) => setTimeout(r, interval))
+        }
+
+        // Fetch fresh, bypassing cache
+        const raw = await resolveFromSources(
+          query.sources,
+          query.strategy ?? 'fallback',
+          args as unknown[],
+        )
+        latest = transform(raw)
+
+        if (predicate(latest, previous)) {
+          await updateCacheAndNotify(latest)
+          return latest
+        }
+      }
+
+      // Exhausted: still update cache with latest fetched data
+      if (latest !== undefined) {
+        await updateCacheAndNotify(latest)
+      }
+
+      return undefined
+    },
+
     /** Clear all caches and reset health tracking. */
     async reset() {
       await cache.clear()
