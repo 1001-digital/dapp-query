@@ -3,7 +3,7 @@
 Vue 3 composables for [dapp-query](../../README.md).
 
 ```
-npm install @dapp-query/vue @dapp-query/core
+npm install @1001-digital/dapp-query-vue @1001-digital/dapp-query-core
 ```
 
 ## Setup
@@ -12,8 +12,8 @@ Register the plugin with a `QueryClient` instance:
 
 ```ts
 import { createApp } from 'vue'
-import { createQueryClient, idbCache } from '@dapp-query/core'
-import { dappQueryPlugin } from '@dapp-query/vue'
+import { createQueryClient, idbCache } from '@1001-digital/dapp-query-core'
+import { dappQueryPlugin } from '@1001-digital/dapp-query-vue'
 
 const queryClient = createQueryClient({
   cache: idbCache('my-app'),
@@ -28,7 +28,7 @@ app.use(dappQueryPlugin, queryClient)
 Reactive data fetching composable. Subscribes to a query definition and automatically re-fetches when reactive arguments change.
 
 ```ts
-import { useQuery } from '@dapp-query/vue'
+import { useQuery } from '@1001-digital/dapp-query-vue'
 
 const { data, pending, error, revalidating, refresh } = useQuery(
   transfersQuery,
@@ -53,7 +53,7 @@ The second argument is a getter that returns the query args as a tuple. When the
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useQuery } from '@dapp-query/vue'
+import { useQuery } from '@1001-digital/dapp-query-vue'
 
 const address = ref('0xabc...')
 const { data, pending } = useQuery(transfersQuery, () => [address.value])
@@ -71,7 +71,7 @@ const { data, pending } = useQuery(transfersQuery, () => [address.value])
 Access the injected `QueryClient` directly for imperative operations:
 
 ```ts
-import { useQueryClient } from '@dapp-query/vue'
+import { useQueryClient } from '@1001-digital/dapp-query-vue'
 
 const client = useQueryClient()
 await client.invalidate(transfersQuery, '0xabc...')
@@ -80,7 +80,7 @@ await client.invalidate(transfersQuery, '0xabc...')
 ## Peer Dependencies
 
 - `vue` >= 3.3.0
-- `@1001-digital/dapp-query-core` (workspace)
+- `@1001-digital/dapp-query-core`
 
 ## License
 

@@ -3,7 +3,7 @@
 Resilient on-chain data queries with multi-source fallback and local caching.
 
 ```
-npm install @dapp-query/core
+npm install @1001-digital/dapp-query-core
 ```
 
 ## What it does
@@ -13,7 +13,7 @@ Define data sources (RPC nodes, GraphQL indexers, REST APIs), and the query clie
 ## Quick Start
 
 ```ts
-import { createQueryClient, graphqlSource, rpcSource, idbCache } from '@dapp-query/core'
+import { createQueryClient, graphqlSource, rpcSource, idbCache } from '@1001-digital/dapp-query-core'
 import { createPublicClient, http, parseAbiItem } from 'viem'
 import { mainnet } from 'viem/chains'
 

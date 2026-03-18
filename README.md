@@ -3,7 +3,7 @@
 Resilient data queries for decentralized frontends. Fetch on-chain data from multiple sources with automatic fallback, caching, and live updates.
 
 ```
-npm install @dapp-query/core
+npm install @1001-digital/dapp-query-core
 ```
 
 ## The Problem
@@ -24,7 +24,7 @@ import {
   graphqlSource,
   rpcSource,
   idbCache,
-} from '@dapp-query/core'
+} from '@1001-digital/dapp-query-core'
 import { createPublicClient, http, parseAbiItem } from 'viem'
 import { mainnet } from 'viem/chains'
 
@@ -206,15 +206,15 @@ interface Cache {
 ## Vue Integration
 
 ```
-npm install @dapp-query/vue
+npm install @1001-digital/dapp-query-vue
 ```
 
 ### Setup
 
 ```ts
 import { createApp } from 'vue'
-import { createQueryClient, idbCache } from '@dapp-query/core'
-import { dappQueryPlugin } from '@dapp-query/vue'
+import { createQueryClient, idbCache } from '@1001-digital/dapp-query-core'
+import { dappQueryPlugin } from '@1001-digital/dapp-query-vue'
 
 const queryClient = createQueryClient({
   cache: idbCache('my-app'),
@@ -227,7 +227,7 @@ app.use(dappQueryPlugin, queryClient)
 ### useQuery
 
 ```ts
-import { useQuery } from '@dapp-query/vue'
+import { useQuery } from '@1001-digital/dapp-query-vue'
 
 const { data, pending, error, revalidating, refresh } = useQuery(
   transfersQuery,
